@@ -21,12 +21,12 @@ export DB_PORT=5432
 """
     let m = dotenv::parse(sample)
 
-    runner_assert_eq(r, dotenv::get(m, "APP_NAME"), "AlyaEngine", "parse basic string")
+    runner_assert_str_eq(r, dotenv::get(m, "APP_NAME"), "AlyaEngine", "parse basic string")
     runner_assert_eq(r, dotenv::get_int(m, "PORT"), 8080, "parse integer")
     runner_assert_eq(r, dotenv::get_bool(m, "DEBUG"), 1, "parse boolean true")
     runner_assert(r, dotenv::get_float(m, "RATIO") > 3.0, "parse float")
-    runner_assert_eq(r, dotenv::get(m, "EMPTY_VAL", "default"), "default", "fallback default on empty")
-    runner_assert_eq(r, dotenv::get(m, "DB_HOST"), "localhost", "export keyword parsing")
+    runner_assert_str_eq(r, dotenv::get(m, "EMPTY_VAL", "default"), "default", "fallback default on empty")
+    runner_assert_str_eq(r, dotenv::get(m, "DB_HOST"), "localhost", "export keyword parsing")
     runner_assert_eq(r, dotenv::has(m, "APP_NAME"), 1, "has key check")
     runner_assert_eq(r, dotenv::has(m, "NON_EXISTENT"), 0, "has missing key check")
 end
@@ -41,10 +41,10 @@ WITH_HASH="Contains # inside quotes"
 """
     let m = dotenv::parse(sample)
 
-    runner_assert_eq(r, dotenv::get(m, "QUOTED_DOUBLE"), "Hello World", "double quotes stripped")
-    runner_assert_eq(r, dotenv::get(m, "QUOTED_SINGLE"), "Plain String # not a comment", "single quotes preserved without comment strip")
-    runner_assert_eq(r, dotenv::get(m, "INLINE_COMMENT"), "ValueWithoutQuotes", "inline comment stripped")
-    runner_assert_eq(r, dotenv::get(m, "WITH_HASH"), "Contains # inside quotes", "hash preserved inside double quotes")
+    runner_assert_str_eq(r, dotenv::get(m, "QUOTED_DOUBLE"), "Hello World", "double quotes stripped")
+    runner_assert_str_eq(r, dotenv::get(m, "QUOTED_SINGLE"), "Plain String # not a comment", "single quotes preserved without comment strip")
+    runner_assert_str_eq(r, dotenv::get(m, "INLINE_COMMENT"), "ValueWithoutQuotes", "inline comment stripped")
+    runner_assert_str_eq(r, dotenv::get(m, "WITH_HASH"), "Contains # inside quotes", "hash preserved inside double quotes")
 end
 
 function test_interpolation(r)
@@ -55,7 +55,7 @@ API_URL="http://${{HOST}}:${{PORT}}/v1"
 """
     let m = dotenv::parse(sample)
 
-    runner_assert_eq(r, dotenv::get(m, "API_URL"), "http://127.0.0.1:9000/v1", "variable interpolation")
+    runner_assert_str_eq(r, dotenv::get(m, "API_URL"), "http://127.0.0.1:9000/v1", "variable interpolation")
 end
 
 function test_file_operations(r)
@@ -64,7 +64,7 @@ function test_file_operations(r)
     fs_write(test_file, sample)
 
     let m = dotenv::load_file(test_file)
-    runner_assert_eq(r, dotenv::get(m, "ENV_KEY"), "TempSavedVal", "load_file reads disk file")
+    runner_assert_str_eq(r, dotenv::get(m, "ENV_KEY"), "TempSavedVal", "load_file reads disk file")
     runner_assert_eq(r, dotenv::get_int(m, "ENV_INT"), 42, "load_file parses int")
 
     if fs_exists(test_file)

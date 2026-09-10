@@ -2,21 +2,11 @@
 # Alya Dotenv Test Suite
 # ═══════════════════════════════════════════════════════════════
 
-import "std/color"
+import "std/test"
 import "std/fs"
 import "../src/lib.alya" as dotenv
 
-function assert_test(name, cond, details = "")
-    if cond
-        say color_green("  ✓ ") + name
-        return 1
-    else
-        say color_red("  ✗ ") + name + color_red(" (FAILED: ") + details + color_red(")")
-        return 0
-    end
-end
-
-function test_basic_parsing()
+function test_basic_parsing(r)
     let sample = """
 # Configuration for Alya App
 APP_NAME=AlyaEngine
@@ -31,19 +21,17 @@ export DB_PORT=5432
 """
     let m = dotenv::parse(sample)
 
-    let passed = 0
-    passed += assert_test("parse basic string", dotenv::get(m, "APP_NAME") == "AlyaEngine", dotenv::get(m, "APP_NAME"))
-    passed += assert_test("parse integer", dotenv::get_int(m, "PORT") == 8080, str(dotenv::get_int(m, "PORT")))
-    passed += assert_test("parse boolean true", dotenv::get_bool(m, "DEBUG") == 1, str(dotenv::get_bool(m, "DEBUG")))
-    passed += assert_test("parse float", dotenv::get_float(m, "RATIO") > 3.0, "ratio <= 3.0")
-    passed += assert_test("fallback default on empty", dotenv::get(m, "EMPTY_VAL", "default") == "default", dotenv::get(m, "EMPTY_VAL", "default"))
-    passed += assert_test("export keyword parsing", dotenv::get(m, "DB_HOST") == "localhost", dotenv::get(m, "DB_HOST"))
-    passed += assert_test("has key check", dotenv::has(m, "APP_NAME") == 1, "missing")
-    passed += assert_test("has missing key check", dotenv::has(m, "NON_EXISTENT") == 0, "found")
-    return passed
+    runner_assert_eq(r, dotenv::get(m, "APP_NAME"), "AlyaEngine", "parse basic string")
+    runner_assert_eq(r, dotenv::get_int(m, "PORT"), 8080, "parse integer")
+    runner_assert_eq(r, dotenv::get_bool(m, "DEBUG"), 1, "parse boolean true")
+    runner_assert(r, dotenv::get_float(m, "RATIO") > 3.0, "parse float")
+    runner_assert_eq(r, dotenv::get(m, "EMPTY_VAL", "default"), "default", "fallback default on empty")
+    runner_assert_eq(r, dotenv::get(m, "DB_HOST"), "localhost", "export keyword parsing")
+    runner_assert_eq(r, dotenv::has(m, "APP_NAME"), 1, "has key check")
+    runner_assert_eq(r, dotenv::has(m, "NON_EXISTENT"), 0, "has missing key check")
 end
 
-function test_quotes_and_comments()
+function test_quotes_and_comments(r)
     let sample = """
 # Comment line
 QUOTED_DOUBLE="Hello World"
@@ -53,15 +41,13 @@ WITH_HASH="Contains # inside quotes"
 """
     let m = dotenv::parse(sample)
 
-    let passed = 0
-    passed += assert_test("double quotes stripped", dotenv::get(m, "QUOTED_DOUBLE") == "Hello World", dotenv::get(m, "QUOTED_DOUBLE"))
-    passed += assert_test("single quotes preserved without comment strip", dotenv::get(m, "QUOTED_SINGLE") == "Plain String # not a comment", dotenv::get(m, "QUOTED_SINGLE"))
-    passed += assert_test("inline comment stripped", dotenv::get(m, "INLINE_COMMENT") == "ValueWithoutQuotes", dotenv::get(m, "INLINE_COMMENT"))
-    passed += assert_test("hash preserved inside double quotes", dotenv::get(m, "WITH_HASH") == "Contains # inside quotes", dotenv::get(m, "WITH_HASH"))
-    return passed
+    runner_assert_eq(r, dotenv::get(m, "QUOTED_DOUBLE"), "Hello World", "double quotes stripped")
+    runner_assert_eq(r, dotenv::get(m, "QUOTED_SINGLE"), "Plain String # not a comment", "single quotes preserved without comment strip")
+    runner_assert_eq(r, dotenv::get(m, "INLINE_COMMENT"), "ValueWithoutQuotes", "inline comment stripped")
+    runner_assert_eq(r, dotenv::get(m, "WITH_HASH"), "Contains # inside quotes", "hash preserved inside double quotes")
 end
 
-function test_interpolation()
+function test_interpolation(r)
     let sample = """
 HOST=127.0.0.1
 PORT=9000
@@ -69,50 +55,36 @@ API_URL="http://${{HOST}}:${{PORT}}/v1"
 """
     let m = dotenv::parse(sample)
 
-    let passed = 0
-    passed += assert_test("variable interpolation", dotenv::get(m, "API_URL") == "http://127.0.0.1:9000/v1", dotenv::get(m, "API_URL"))
-    return passed
+    runner_assert_eq(r, dotenv::get(m, "API_URL"), "http://127.0.0.1:9000/v1", "variable interpolation")
 end
 
-function test_file_operations()
+function test_file_operations(r)
     let test_file = "test_temp.env"
     let sample = "ENV_KEY=TempSavedVal\nENV_INT=42\n"
     fs_write(test_file, sample)
 
     let m = dotenv::load_file(test_file)
-    let passed = 0
-    passed += assert_test("load_file reads disk file", dotenv::get(m, "ENV_KEY") == "TempSavedVal", dotenv::get(m, "ENV_KEY"))
-    passed += assert_test("load_file parses int", dotenv::get_int(m, "ENV_INT") == 42, str(dotenv::get_int(m, "ENV_INT")))
+    runner_assert_eq(r, dotenv::get(m, "ENV_KEY"), "TempSavedVal", "load_file reads disk file")
+    runner_assert_eq(r, dotenv::get_int(m, "ENV_INT"), 42, "load_file parses int")
 
     if fs_exists(test_file)
         fs_remove(test_file)
     end
-    return passed
 end
 
 function main()
-    say color_cyan("═══════════════════════════════════════════════════")
-    say color_cyan("          Alya Dotenv Package Test Suite            ")
-    say color_cyan("═══════════════════════════════════════════════════")
-    say ""
+    test_suite("Alya Dotenv Package Test Suite")
+    let r = runner_new()
 
-    let passed = 0
-    let total = 15
+    test_basic_parsing(r)
+    test_quotes_and_comments(r)
+    test_interpolation(r)
+    test_file_operations(r)
 
-    passed += test_basic_parsing()
-    passed += test_quotes_and_comments()
-    passed += test_interpolation()
-    passed += test_file_operations()
-
-    say ""
-    say color_cyan("───────────────────────────────────────────────────")
-    if passed == total
-        say color_green("All " + str(total) + " tests passed successfully! ✓")
-    else
-        say color_red(str(total - passed) + " tests failed out of " + str(total))
+    let failed = runner_summary(r)
+    if failed > 0
         exit(1)
     end
-    say color_cyan("═══════════════════════════════════════════════════")
 end
 
 main()

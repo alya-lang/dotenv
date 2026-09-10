@@ -10,7 +10,8 @@
 
 # Alya runtime, packages, and caches
 .alya/
-Alya.lock.bak
+alya.lock
+alya.lock.bak
 *.db
 *.log
 

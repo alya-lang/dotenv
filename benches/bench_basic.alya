@@ -1,0 +1,34 @@
+# Benchmark suite for dotenv
+import "std/bench"
+import "../src/lib.alya" as dotenv
+
+function main()
+    let env_content = "# App Configuration\nAPP_NAME=\"Alya App\"\nAPP_PORT=8080\nDEBUG=true\nDB_HOST=127.0.0.1\nDB_PORT=5432\nCACHE_TTL=3600\nAPI_KEY=secret_alya_token\n# Feature flags\nENABLE_METRICS=true\nRATE_LIMIT=1000\n"
+
+    let runner = bench_runner("Alya Dotenv Micro-Benchmarks")
+
+    # 1. Parse benchmark (10-line dotenv file)
+    bench_start(runner, 10000)
+    let i = 0
+    while i < 10000
+        dotenv::parse(env_content)
+        i += 1
+    end
+    bench_stop(runner, "dotenv::parse (10 variables)")
+
+    # 2. Key lookup benchmark
+    let config = dotenv::parse(env_content)
+    bench_start(runner, 50000)
+    let j = 0
+    while j < 50000
+        dotenv::get(config, "API_KEY", "")
+        dotenv::get_int(config, "APP_PORT", 0)
+        dotenv::get_bool(config, "DEBUG", 0)
+        j += 1
+    end
+    bench_stop(runner, "dotenv::get / get_int / get_bool")
+
+    bench_summary(runner)
+end
+
+main()

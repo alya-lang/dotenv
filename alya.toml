@@ -5,8 +5,8 @@ entry = "src/lib.alya"
 description = "Zero-dependency .env environment variable parser and configuration loader for Alya"
 authors = ["Alya Language Contributors <https://github.com/alya-lang>"]
 license = "MIT"
-homepage = "https://github.com/alya-lang/dotenv"
+homepage = "https://github.com/alya-lang/alya"
 repository = "https://github.com/alya-lang/dotenv"
-keywords = ["alya", "package"]
+keywords = ["alya", "alya-lang", "dotenv", "env", "config", "configuration", "environment-variables"]
 
 [dependencies]

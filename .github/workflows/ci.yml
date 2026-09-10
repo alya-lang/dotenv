@@ -33,7 +33,7 @@ jobs:
         if: steps.cache-alyac.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          cargo install --git https://github.com/Taiizor/Alya --bin alyac
+          cargo install --git https://github.com/alya-lang/alya --bin alyac
 
       - name: Verify alyac installation
         run: |

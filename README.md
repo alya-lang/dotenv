@@ -2,10 +2,10 @@
 
 [![CI](https://github.com/alya-lang/dotenv/actions/workflows/ci.yml/badge.svg)](https://github.com/alya-lang/dotenv/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Alya](https://img.shields.io/badge/Alya-%3E%3D0.0.5-orange.svg)](https://github.com/Taiizor/Alya)
+[![Alya](https://img.shields.io/badge/Alya-%3E%3D0.0.5-orange.svg)](https://github.com/alya-lang/alya)
 [![Package Version](https://img.shields.io/badge/version-0.1.0-brightgreen.svg)](alya.toml)
 
-Zero-dependency `.env` environment variable parser and configuration loader for the [Alya Programming Language](https://github.com/Taiizor/Alya).
+Zero-dependency `.env` environment variable parser and configuration loader for the [Alya Programming Language](https://github.com/alya-lang/alya).
 
 ---
 

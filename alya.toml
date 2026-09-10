@@ -1,6 +1,7 @@
 [package]
 name = "dotenv"
 version = "0.1.0"
+alya-version = "0.0.5"
 entry = "src/lib.alya"
 description = "Zero-dependency .env environment variable parser and configuration loader for Alya"
 authors = ["Alya Language Contributors <https://github.com/alya-lang>"]

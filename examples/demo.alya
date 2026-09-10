@@ -1,0 +1,26 @@
+# Demonstrates dotenv package in action
+import "std/color"
+import "../src/lib.alya" as dotenv
+
+function main()
+    say color_cyan("═══════════════════════════════════════════════════")
+    say color_cyan("              Alya Dotenv Live Demo                ")
+    say color_cyan("═══════════════════════════════════════════════════")
+
+    let cfg = dotenv::load_file("examples/sample.env")
+
+    let app = dotenv::get(cfg, "APP_NAME", "DefaultApp")
+    let port = dotenv::get_int(cfg, "PORT", 3000)
+    let debug_mode = dotenv::get_bool(cfg, "DEBUG", 0)
+    let workers = dotenv::get_int(cfg, "MAX_WORKERS", 1)
+    let db_url = dotenv::get(cfg, "DATABASE_URL")
+
+    say "  Application:   " + style_bold(app)
+    say "  Listening on:  " + color_green("http://localhost:" + str(port))
+    say "  Debug Mode:    " + (debug_mode == 1 ? color_yellow("ENABLED") : "DISABLED")
+    say "  Worker Pool:   " + str(workers) + " thread(s)"
+    say "  Database URL:  " + color_blue(db_url)
+    say color_cyan("═══════════════════════════════════════════════════")
+end
+
+main()

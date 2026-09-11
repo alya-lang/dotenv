@@ -5,13 +5,13 @@
 [![Alya](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Falya-lang%2Fdotenv%2Fmain%2Falya.toml&query=%24.package.alya-version&label=Alya&color=orange&prefix=%3E%3D)](https://github.com/alya-lang/alya)
 [![Package Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Falya-lang%2Fdotenv%2Fmain%2Falya.toml&query=%24.package.version&label=Version&color=brightgreen)](alya.toml)
 
-Zero-dependency `.env` environment variable parser and configuration loader for the [Alya Programming Language](https://github.com/alya-lang/alya).
+Environment variable (.env) parser, interpolation, and configuration loader for the [Alya Programming Language](https://github.com/alya-lang/alya).
 
 ---
 
 ## 🌟 Features
 
-- ⚡ **Lightweight & Pure Alya**: Zero external dependencies, fast lexical parsing
+- ⚡ **Lightweight & Fast**: Fast lexical parsing and configuration loading
 - 📄 **File & In-Memory Support**: Load `.env` from disk or parse arbitrary strings
 - 🛡️ **Quoted & Escaped Strings**: Supports single (`'`) and double (`"`) quotes, escaped newlines and tabs
 - 💬 **Inline Comments**: Automatically strips trailing `#` comments outside quotes
@@ -152,11 +152,18 @@ alyac run examples/demo.alya
 
 Contributions are welcome! Please follow these steps:
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/my-feature`)
-3. Commit your changes (`git commit -m "feat: add support for multiline values"`)
-4. Push to the branch (`git push origin feature/my-feature`)
-5. Open a Pull Request
+1. Fork the repository and clone it locally
+2. Install dependencies:
+   ```bash
+   alyac install
+   ```
+3. Create your feature branch (`git checkout -b feature/my-feature`)
+4. Verify tests and formatting before opening a PR:
+   ```bash
+   alyac test
+   alyac fmt . --check
+   ```
+5. Commit your changes (`git commit -m "feat: add feature"`) and open a Pull Request
 
 ---
 

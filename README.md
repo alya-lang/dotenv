@@ -47,13 +47,13 @@ Add `dotenv` to the `[dependencies]` section in your `alya.toml`:
 
 ```toml
 [dependencies]
-dotenv = { git = "https://github.com/alya-lang/dotenv", tag = "v0.1.0" }
+dotenv = { git = "https://github.com/alya-lang/dotenv", branch = "main" }
 ```
 
 Or install it directly using the Alya package CLI:
 
 ```bash
-alyac add dotenv --git https://github.com/alya-lang/dotenv --tag v0.1.0
+alyac add dotenv --git https://github.com/alya-lang/dotenv --branch main
 alyac install
 ```
 

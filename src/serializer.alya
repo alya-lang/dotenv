@@ -1,0 +1,25 @@
+# ═══════════════════════════════════════════════════════════════
+# Dotenv Serializer Module
+# ═══════════════════════════════════════════════════════════════
+
+import "std/str"
+
+# Serializes an env_map back to .env format string
+function dump(env_map)
+    let out = ""
+    let ks = env_map.keys()
+    let i = 0
+    let total = len(ks)
+    while i < total
+        let k = ks[i]
+        let raw = env_map[k]
+        let v = str_from_ptr(raw)
+        if contains(v, " ") or contains(v, "#") or contains(v, "\n")
+            out = out + k + "=\"" + v + "\"\n"
+        else
+            out = out + k + "=" + v + "\n"
+        end
+        i += 1
+    end
+    return out
+end

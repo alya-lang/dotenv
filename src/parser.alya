@@ -1,0 +1,157 @@
+# ═══════════════════════════════════════════════════════════════
+# Dotenv Parser Module
+# ═══════════════════════════════════════════════════════════════
+
+import "std/str"
+import "std/fs"
+import "std/os"
+
+# Checks if a character is ASCII whitespace
+function is_space_char(ch)
+    return ch == " " or ch == "\t" or ch == "\r" or ch == "\n"
+end
+
+# Strips quotes and resolves escaped characters for double quotes
+function unquote_value(val)
+    let vlen = len(val)
+    if vlen >= 2
+        let first = char_at(val, 0)
+        let last = char_at(val, vlen - 1)
+        if (first == "\"" and last == "\"") or (first == "'" and last == "'")
+            let inner = substring(val, 1, vlen - 2)
+            if first == "\""
+                inner = replace(inner, "\\n", "\n")
+                inner = replace(inner, "\\t", "\t")
+                inner = replace(inner, "\\r", "\r")
+                inner = replace(inner, "\\\"", "\"")
+                inner = replace(inner, "\\\\", "\\")
+            end
+            return inner
+        end
+    end
+    return val
+end
+
+# Strips unquoted inline comments like: FOO=bar # comment
+function strip_inline_comment(val)
+    let vlen = len(val)
+    if vlen == 0
+        return val
+    end
+    let first = char_at(val, 0)
+    if first == "\"" or first == "'"
+        return val
+    end
+
+    let hash_idx = index_of(val, "#")
+    if hash_idx >= 0
+        if hash_idx == 0
+            return ""
+        end
+        let prev_ch = char_at(val, hash_idx - 1)
+        if is_space_char(prev_ch)
+            return trim(substring(val, 0, hash_idx))
+        end
+    end
+    return val
+end
+
+# Checks whether a key exists in env_map
+function has(env_map, key)
+    let ks = env_map.keys()
+    let i = 0
+    let klen = len(ks)
+    while i < klen
+        if ks[i] == key
+            return 1
+        end
+        i += 1
+    end
+    return 0
+end
+
+# Expands ${VAR} interpolations using current parsed map and OS environment
+function interpolate(val, env_map)
+    let res = val
+    while contains(res, "${")
+        let start = index_of(res, "${")
+        let end_idx = index_of(res, "}")
+        if start >= 0 and end_idx > start
+            let var_name = substring(res, start + 2, end_idx - (start + 2))
+            let replacement = ""
+            if has(env_map, var_name)
+                let raw_val = env_map[var_name]
+                replacement = str_from_ptr(raw_val)
+            else
+                replacement = env(var_name)
+            end
+            let target = "${" + var_name + "}"
+            res = replace(res, target, replacement)
+        else
+            break
+        end
+    end
+    return res
+end
+
+# Parses raw .env string content into a key-value Map
+function parse(content)
+    let env_map = map()
+    let lines = split(content, "\n")
+    let idx = 0
+    let total_lines = len(lines)
+
+    while idx < total_lines
+        let raw_line = trim(lines[idx])
+        idx += 1
+
+        if ends_with(raw_line, "\r")
+            raw_line = substring(raw_line, 0, len(raw_line) - 1)
+        end
+
+        # Skip empty lines and comments
+        if len(raw_line) == 0 or starts_with(raw_line, "#")
+            continue
+        end
+
+        # Support 'export KEY=value' syntax
+        if starts_with(raw_line, "export ")
+            raw_line = trim(substring(raw_line, 7, len(raw_line) - 7))
+        end
+
+        let eq_idx = index_of(raw_line, "=")
+        if eq_idx < 1
+            continue
+        end
+
+        let key = trim(substring(raw_line, 0, eq_idx))
+        let val = trim(substring(raw_line, eq_idx + 1, len(raw_line) - (eq_idx + 1)))
+
+        val = strip_inline_comment(val)
+        val = unquote_value(val)
+        val = interpolate(val, env_map)
+
+        env_map[key] = val
+    end
+
+    return env_map
+end
+
+# Loads and parses a specific environment file
+function load_file(path)
+    if fs_exists(path) == 0
+        return map()
+    end
+    let content = fs_read(path)
+    return parse(content)
+end
+
+# Loads .env from current working directory, falling back to .env.local
+function load()
+    if fs_exists(".env")
+        return load_file(".env")
+    elif fs_exists(".env.local")
+        return load_file(".env.local")
+    end
+    return map()
+end

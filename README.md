@@ -21,6 +21,26 @@ Zero-dependency `.env` environment variable parser and configuration loader for 
 
 ---
 
+## 📁 Project Architecture
+
+```text
+dotenv/
+├── alya.toml               # Package manifest
+├── src/
+│   ├── lib.alya            # Public API facade
+│   ├── parser.alya         # Lexical line parser, quote/escape, interpolation
+│   ├── serializer.alya     # .env text serializer (dump)
+│   └── getters.alya        # Type-safe value extractors
+├── examples/
+│   └── demo.alya           # Runnable usage example
+├── tests/
+│   └── test_basic.alya     # Automated test suite
+└── benches/
+    └── bench_basic.alya    # Micro-benchmarks
+```
+
+---
+
 ## 📦 Installation
 
 Add `dotenv` to the `[dependencies]` section in your `alya.toml`:
@@ -106,40 +126,24 @@ main()
 
 ---
 
-## 🧪 Running Tests
+## 🧪 Running Tests & Benchmarks
 
-Run the full automated test suite using `alyac`:
+Run the automated test suite:
 
 ```bash
-cd E:/MyProject/Alya/Lib/dotenv
 alyac run tests/test_basic.alya
 ```
 
-Test results:
-```text
-═══════════════════════════════════════════════════
-          Alya Dotenv Package Test Suite            
-═══════════════════════════════════════════════════
+Run the performance micro-benchmarks:
 
-  ✓ parse basic string
-  ✓ parse integer
-  ✓ parse boolean true
-  ✓ parse float
-  ✓ fallback default on empty
-  ✓ export keyword parsing
-  ✓ has key check
-  ✓ has missing key check
-  ✓ double quotes stripped
-  ✓ single quotes preserved without comment strip
-  ✓ inline comment stripped
-  ✓ hash preserved inside double quotes
-  ✓ variable interpolation
-  ✓ load_file reads disk file
-  ✓ load_file parses int
+```bash
+alyac run benches/bench_basic.alya
+```
 
-───────────────────────────────────────────────────
-All 15 tests passed successfully! ✓
-═══════════════════════════════════════════════════
+Run the runnable usage demo:
+
+```bash
+alyac run examples/demo.alya
 ```
 
 ---

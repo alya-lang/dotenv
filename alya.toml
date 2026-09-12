@@ -1,6 +1,6 @@
 [package]
 name = "dotenv"
-version = "0.2.0"
+version = "0.3.0"
 alya-version = "0.0.12"
 entry = "src/lib.alya"
 description = "Environment variable (.env) parser, interpolation, and configuration loader for Alya"

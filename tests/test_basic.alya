@@ -72,6 +72,28 @@ function test_file_operations(r)
     end
 end
 
+function test_dotenv_struct_methods(r)
+    let sample = """
+APP_TITLE=Microservice
+PORT=4000
+DEBUG=on
+RATIO=2.718
+"""
+    let env_cfg = dotenv::dotenv_parse(sample)
+    runner_assert(r, env_cfg is not null, "env_cfg struct is not null")
+    runner_assert_str_eq(r, env_cfg.get("APP_TITLE"), "Microservice", "struct method get")
+    runner_assert_eq(r, env_cfg.get_int("PORT"), 4000, "struct method get_int")
+    runner_assert_eq(r, env_cfg.get_bool("DEBUG"), 1, "struct method get_bool")
+    runner_assert(r, env_cfg.get_float("RATIO") > 2.7, "struct method get_float")
+    runner_assert_eq(r, env_cfg.has("PORT"), 1, "struct method has")
+    runner_assert_eq(r, env_cfg.has("NON_EXISTENT"), 0, "struct method has missing")
+
+    env_cfg.set("NEW_VAR", "Hello")
+    runner_assert_str_eq(r, env_cfg.get("NEW_VAR"), "Hello", "struct method set")
+    let dumped = env_cfg.dump()
+    runner_assert(r, contains(dumped, "NEW_VAR=Hello"), "struct method dump")
+end
+
 function main()
     test_suite("Alya Dotenv Package Test Suite")
     let r = runner_new()
@@ -80,6 +102,7 @@ function main()
     test_quotes_and_comments(r)
     test_interpolation(r)
     test_file_operations(r)
+    test_dotenv_struct_methods(r)
 
     let failed = runner_summary(r)
     if failed > 0

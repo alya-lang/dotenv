@@ -9,19 +9,75 @@ import "./parser.alya"
 import "./serializer.alya"
 import "./getters.alya"
 
+# Primary configuration struct wrapping parsed env map
+pub struct Dotenv
+    entries
+end
+
+# Creates a new Dotenv instance wrapping an optional map
+pub function dotenv_new(entries = null)
+    return Dotenv {
+        entries: entries is not null ? entries : map()
+    }
+end
+
+# Parses raw .env content into a Dotenv struct instance
+pub function dotenv_parse(content)
+    return dotenv_new(parse(content))
+end
+
+# Loads an environment file into a Dotenv struct instance
+pub function dotenv_load(path = "")
+    if len(path) > 0
+        return dotenv_new(load_file(path))
+    end
+    return dotenv_new(load())
+end
+
+# --- Idiomatic Struct Methods on Dotenv ---
+
+pub function Dotenv.get(self, key, default_val = "")
+    return get(self.entries, key, default_val)
+end
+
+pub function Dotenv.get_int(self, key, default_val = 0)
+    return get_int(self.entries, key, default_val)
+end
+
+pub function Dotenv.get_bool(self, key, default_val = 0)
+    return get_bool(self.entries, key, default_val)
+end
+
+pub function Dotenv.get_float(self, key, default_val = 0.0)
+    return get_float(self.entries, key, default_val)
+end
+
+pub function Dotenv.has(self, key)
+    return has(self.entries, key)
+end
+
+pub function Dotenv.set(self, key, val)
+    self.entries[key] = val
+    return self
+end
+
+pub function Dotenv.dump(self)
+    return dump(self.entries)
+end
+
 # Public API Facade Functions
 
 # Parses raw .env string content into a key-value Map
-function parse_env(content)
+pub function parse_env(content)
     return parse(content)
 end
 
 # Loads .env from current working directory
-function load_env()
+pub function load_env()
     return load()
 end
 
 # Serializes an env_map back to .env format string
-function dump_env(env_map)
+pub function dump_env(env_map)
     return dump(env_map)
 end

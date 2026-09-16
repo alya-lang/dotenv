@@ -6,19 +6,21 @@ import "std/str"
 import "./parser.alya"
 
 # Gets a string value from env_map, or default_val if key not found or empty
-function get(env_map, key, default_val = "")
-    if has(env_map, key)
+pub function get(env_map, key, default_val = "")
+    if env_map is not null and has(env_map, key)
         let raw = env_map[key]
-        let v = str_from_ptr(raw)
-        if len(v) > 0
-            return v
+        if raw is not null
+            let v = str_from_ptr(raw)
+            if len(v) > 0
+                return v
+            end
         end
     end
     return default_val
 end
 
 # Gets an integer value from env_map, or default_val
-function get_int(env_map, key, default_val = 0)
+pub function get_int(env_map, key, default_val = 0)
     let val_str = get(env_map, key, "")
     if len(val_str) == 0
         return default_val
@@ -27,18 +29,17 @@ function get_int(env_map, key, default_val = 0)
 end
 
 # Gets a boolean value (true, 1, yes, on -> 1; false, 0, no, off -> 0)
-function get_bool(env_map, key, default_val = 0)
+pub function get_bool(env_map, key, default_val = 0)
     let val_str = lower(trim(get(env_map, key, "")))
-    if val_str == "true" or val_str == "1" or val_str == "yes" or val_str == "on"
-        return 1
-    elif val_str == "false" or val_str == "0" or val_str == "no" or val_str == "off"
-        return 0
+    when val_str
+        is "true", "1", "yes", "on" then return 1
+        is "false", "0", "no", "off" then return 0
+        else return default_val
     end
-    return default_val
 end
 
 # Gets a float value from env_map, or default_val
-function get_float(env_map, key, default_val = 0.0)
+pub function get_float(env_map, key, default_val = 0.0)
     let val_str = get(env_map, key, "")
     if len(val_str) == 0
         return default_val

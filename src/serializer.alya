@@ -4,22 +4,25 @@
 
 import "std/str"
 
+pub enum QuoteMode
+    Auto = 0,
+    Always = 1,
+    Never = 2
+end
+
 # Serializes an env_map back to .env format string
-function dump(env_map)
+pub function dump(env_map)
+    if env_map is null
+        return ""
+    end
     let out = ""
-    let ks = env_map.keys()
-    let i = 0
-    let total = len(ks)
-    while i < total
-        let k = ks[i]
-        let raw = env_map[k]
-        let v = str_from_ptr(raw)
+    for k, raw in env_map
+        let v = raw is not null ? str_from_ptr(raw) : ""
         if contains(v, " ") or contains(v, "#") or contains(v, "\n")
-            out = out + k + "=\"" + v + "\"\n"
+            out += k + "=\"" + v + "\"\n"
         else
-            out = out + k + "=" + v + "\n"
+            out += k + "=" + v + "\n"
         end
-        i += 1
     end
     return out
 end

@@ -1,25 +1,54 @@
-# ═══════════════════════════════════════════════════════════════
-# Dotenv Serializer Module
-# ═══════════════════════════════════════════════════════════════
+## # dotenv/serializer
+##
+## Serialization module for dotenv environment maps.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
+##
+## Converts in-memory key-value maps to properly formatted and escaped .env strings.
 
 import "std/str"
+import "./types.alya"
 
-pub enum QuoteMode
-    Auto = 0,
-    Always = 1,
-    Never = 2
+## Serializes an environment map back to a .env formatted string using standard Auto quoting.
+##
+## ### Parameters
+## - `env_map`: Map of key-value pairs to serialize.
+##
+## ### Returns
+## Formatted `.env` string.
+pub function dump(env_map) -> string
+    return dump_with_quote_mode(env_map, QuoteMode.Auto)
 end
 
-# Serializes an env_map back to .env format string
-pub function dump(env_map)
+## Serializes an environment map back to a .env formatted string with explicit QuoteMode.
+##
+## ### Parameters
+## - `env_map`: Map of key-value pairs to serialize.
+## - `quote_mode`: Target `QuoteMode` enum variant.
+##
+## ### Returns
+## Formatted `.env` string.
+pub function dump_with_quote_mode(env_map, quote_mode: QuoteMode) -> string
     if env_map is null
         return ""
     end
+
+    let qm = quote_mode as int
     let out = ""
     for k, raw in env_map
         let v = raw is not null ? str_from_ptr(raw) : ""
-        if contains(v, " ") or contains(v, "#") or contains(v, "\n")
-            out += k + "=\"" + v + "\"\n"
+        let should_quote = 0
+        when qm
+            is 1 then should_quote = 1
+            is 2 then should_quote = 0
+            else
+                if contains(v, " ") or contains(v, "#") or contains(v, "\n") or contains(v, "\r") or contains(v, "=")
+                    should_quote = 1
+                end
+        end
+
+        if should_quote == 1
+            let escaped = replace(v, "\"", "\\\"")
+            out += k + "=\"" + escaped + "\"\n"
         else
             out += k + "=" + v + "\n"
         end

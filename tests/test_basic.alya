@@ -94,6 +94,40 @@ RATIO=2.718
     runner_assert(r, contains(dumped, "NEW_VAR=Hello"), "struct method dump")
 end
 
+function test_enums_and_options(r)
+    # QuoteMode tests
+    let m = map()
+    m["SIMPLE"] = "hello"
+    m["SPACED"] = "hello world"
+
+    let dump_auto = dotenv::dump(m)
+    runner_assert(r, contains(dump_auto, "SIMPLE=hello"), "dump auto unquoted for simple")
+    runner_assert(r, contains(dump_auto, "SPACED=\"hello world\""), "dump auto quoted for spaced")
+
+    let dump_always = dotenv::dump_with_quote_mode(m, dotenv::QuoteMode.Always)
+    runner_assert(r, contains(dump_always, "SIMPLE=\"hello\""), "dump always quotes simple")
+    runner_assert(r, contains(dump_always, "SPACED=\"hello world\""), "dump always quotes spaced")
+
+    let dump_never = dotenv::dump_with_quote_mode(m, dotenv::QuoteMode.Never)
+    runner_assert(r, contains(dump_never, "SIMPLE=hello"), "dump never omits quotes simple")
+    runner_assert(r, contains(dump_never, "SPACED=hello world"), "dump never omits quotes spaced")
+
+    # InterpolateMode tests
+    let template = "BASE=abc\nFULL=${{BASE}}_123\n"
+    let no_interp_opts = dotenv::options_with_interpolate(dotenv::InterpolateMode.Disabled)
+    let m_no_interp = dotenv::parse_with_options(template, no_interp_opts)
+    runner_assert_str_eq(r, dotenv::get(m_no_interp, "FULL"), "${{BASE}}_123", "disabled interpolation leaves raw token")
+
+    let local_opts = dotenv::options_with_interpolate(dotenv::InterpolateMode.LocalOnly)
+    let m_local = dotenv::parse_with_options(template, local_opts)
+    runner_assert_str_eq(r, dotenv::get(m_local, "FULL"), "abc_123", "local interpolation resolves from parsed map")
+
+    # Struct dump with QuoteMode
+    let env_cfg = dotenv::dotenv_new(m)
+    let cfg_always = env_cfg.dump_with_quote_mode(dotenv::QuoteMode.Always)
+    runner_assert(r, contains(cfg_always, "SIMPLE=\"hello\""), "struct dump_with_quote_mode Always")
+end
+
 function main()
     test_suite("Alya Dotenv Package Test Suite")
     let r = runner_new()
@@ -103,6 +137,7 @@ function main()
     test_interpolation(r)
     test_file_operations(r)
     test_dotenv_struct_methods(r)
+    test_enums_and_options(r)
 
     let failed = runner_summary(r)
     if failed > 0

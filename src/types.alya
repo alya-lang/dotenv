@@ -1,0 +1,70 @@
+## # dotenv/types
+##
+## Types, enums, and configuration structures for the dotenv package.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
+##
+## Defines quoting modes, interpolation strategies, and configuration options.
+
+## Quoting strategy for dotenv serialization.
+pub enum QuoteMode
+    Auto = 0,
+    Always = 1,
+    Never = 2
+end
+
+## Variable interpolation strategy during .env parsing.
+pub enum InterpolateMode
+    Disabled = 0,
+    ProcessEnv = 1,
+    LocalOnly = 2
+end
+
+## Configuration options for dotenv parsing and serialization.
+##
+## ### Fields
+## - `quote_mode`: `QuoteMode` variant integer (default `0` / Auto).
+## - `interpolate_mode`: `InterpolateMode` variant integer (default `1` / ProcessEnv).
+## - `allow_empty`: `1` to include empty keys, `0` to omit (default `1`).
+pub struct DotenvOptions
+    quote_mode: int,
+    interpolate_mode: int,
+    allow_empty: int
+end
+
+## Creates a default DotenvOptions instance initialized to standard defaults.
+##
+## ### Returns
+## Initialized `DotenvOptions` struct instance.
+pub function options_new() -> DotenvOptions
+    return DotenvOptions {
+        quote_mode: 0,
+        interpolate_mode: 1,
+        allow_empty: 1
+    }
+end
+
+## Creates a DotenvOptions instance with a specific QuoteMode enum variant.
+##
+## ### Parameters
+## - `mode`: Target `QuoteMode` variant.
+##
+## ### Returns
+## Initialized `DotenvOptions` struct instance.
+pub function options_with_quote_mode(mode: QuoteMode) -> DotenvOptions
+    let opts = options_new()
+    opts.quote_mode = mode as int
+    return opts
+end
+
+## Creates a DotenvOptions instance with a specific InterpolateMode enum variant.
+##
+## ### Parameters
+## - `mode`: Target `InterpolateMode` variant.
+##
+## ### Returns
+## Initialized `DotenvOptions` struct instance.
+pub function options_with_interpolate(mode: InterpolateMode) -> DotenvOptions
+    let opts = options_new()
+    opts.interpolate_mode = mode as int
+    return opts
+end

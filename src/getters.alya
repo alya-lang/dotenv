@@ -1,13 +1,24 @@
-# ═══════════════════════════════════════════════════════════════
-# Dotenv Value Accessors & Typed Getters
-# ═══════════════════════════════════════════════════════════════
+## # dotenv/getters
+##
+## Typed value accessors and fallback helpers for dotenv environment maps.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
+##
+## Converts string values to integers, booleans, and floats with sensible defaults.
 
 import "std/str"
 import "./parser.alya"
 
-# Gets a string value from env_map, or default_val if key not found or empty
-pub function get(env_map, key, default_val = "")
-    if env_map is not null and has(env_map, key)
+## Gets a string value from env_map, returning default_val if key is missing or empty.
+##
+## ### Parameters
+## - `env_map`: Environment variable map.
+## - `key`: Variable key name.
+## - `default_val`: Fallback value if missing (default `""`).
+##
+## ### Returns
+## Resolved string value or default_val.
+pub function get(env_map, key, default_val = "") -> string
+    if env_map is not null and has(env_map, key) == 1
         let raw = env_map[key]
         if raw is not null
             let v = str_from_ptr(raw)
@@ -19,8 +30,29 @@ pub function get(env_map, key, default_val = "")
     return default_val
 end
 
-# Gets an integer value from env_map, or default_val
-pub function get_int(env_map, key, default_val = 0)
+## Gets a string value from env_map, returning default_val if key is missing or empty.
+##
+## ### Parameters
+## - `env_map`: Environment variable map.
+## - `key`: Variable key name.
+## - `default_val`: Fallback string value.
+##
+## ### Returns
+## Resolved string value or default_val.
+pub function get_or_default(env_map, key: string, default_val: string) -> string
+    return get(env_map, key, default_val)
+end
+
+## Gets an integer value from env_map, returning default_val if missing or unparseable.
+##
+## ### Parameters
+## - `env_map`: Environment variable map.
+## - `key`: Variable key name.
+## - `default_val`: Fallback integer if missing (default `0`).
+##
+## ### Returns
+## Parsed integer value or default_val.
+pub function get_int(env_map, key, default_val = 0) -> int
     let val_str = get(env_map, key, "")
     if len(val_str) == 0
         return default_val
@@ -28,8 +60,16 @@ pub function get_int(env_map, key, default_val = 0)
     return to_int(val_str)
 end
 
-# Gets a boolean value (true, 1, yes, on -> 1; false, 0, no, off -> 0)
-pub function get_bool(env_map, key, default_val = 0)
+## Gets a boolean value from env_map (`true`, `1`, `yes`, `on` -> `1`; `false`, `0`, `no`, `off` -> `0`).
+##
+## ### Parameters
+## - `env_map`: Environment variable map.
+## - `key`: Variable key name.
+## - `default_val`: Fallback boolean integer if missing (default `0`).
+##
+## ### Returns
+## Boolean integer (`1` or `0`).
+pub function get_bool(env_map, key, default_val = 0) -> int
     let val_str = lower(trim(get(env_map, key, "")))
     when val_str
         is "true", "1", "yes", "on" then return 1
@@ -38,8 +78,16 @@ pub function get_bool(env_map, key, default_val = 0)
     end
 end
 
-# Gets a float value from env_map, or default_val
-pub function get_float(env_map, key, default_val = 0.0)
+## Gets a floating point number from env_map, returning default_val if missing or unparseable.
+##
+## ### Parameters
+## - `env_map`: Environment variable map.
+## - `key`: Variable key name.
+## - `default_val`: Fallback float if missing (default `0.0`).
+##
+## ### Returns
+## Parsed float value or default_val.
+pub function get_float(env_map, key, default_val = 0.0) -> float
     let val_str = get(env_map, key, "")
     if len(val_str) == 0
         return default_val

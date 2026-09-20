@@ -1,83 +1,167 @@
-# ═══════════════════════════════════════════════════════════════
-# Alya Dotenv Library (dotenv)
-# Part of the Alya Language Ecosystem (https://github.com/alya-lang)
-#
-# A zero-dependency .env environment variable parser and loader.
-# ═══════════════════════════════════════════════════════════════
+## # dotenv
+##
+## Zero-dependency .env environment variable parser, loader, and serializer for Alya.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
+##
+## Provides full RFC-compliant dotenv parsing, variable interpolation, strongly-typed
+## getters (string, int, bool, float), quoting strategies, and struct-based ergonomics.
 
+import "./types.alya"
 import "./parser.alya"
 import "./serializer.alya"
 import "./getters.alya"
 
-# Primary configuration struct wrapping parsed env map
+# ═══════════════════════════════════════════════════════════════
+# Dotenv Configuration Struct & Constructors
+# ═══════════════════════════════════════════════════════════════
+
+## Primary configuration struct wrapping parsed env map.
 pub struct Dotenv
-    entries
+    entries: map
 end
 
-# Creates a new Dotenv instance wrapping an optional map
-pub function dotenv_new(entries = null)
+## Creates a new Dotenv instance wrapping an optional map.
+##
+## ### Parameters
+## - `entries`: Optional initial map of key-value pairs.
+##
+## ### Returns
+## Initialized `Dotenv` struct instance.
+pub function dotenv_new(entries = null) -> Dotenv
     return Dotenv {
         entries: entries is not null ? entries : map()
     }
 end
 
-# Parses raw .env content into a Dotenv struct instance
-pub function dotenv_parse(content)
+## Parses raw .env content into a Dotenv struct instance using default options.
+##
+## ### Parameters
+## - `content`: Raw `.env` file string content.
+##
+## ### Returns
+## Initialized `Dotenv` struct instance.
+pub function dotenv_parse(content) -> Dotenv
     return dotenv_new(parse(content))
 end
 
-# Loads an environment file into a Dotenv struct instance
-pub function dotenv_load(path = "")
+## Parses raw .env content into a Dotenv struct instance with custom DotenvOptions.
+##
+## ### Parameters
+## - `content`: Raw `.env` file string content.
+## - `opts`: Custom `DotenvOptions` configuration.
+##
+## ### Returns
+## Initialized `Dotenv` struct instance.
+pub function dotenv_parse_with_options(content, opts: DotenvOptions) -> Dotenv
+    return dotenv_new(parse_with_options(content, opts))
+end
+
+## Loads an environment file into a Dotenv struct instance.
+##
+## ### Parameters
+## - `path`: Optional file path. If empty, searches `.env` then `.env.local`.
+##
+## ### Returns
+## Initialized `Dotenv` struct instance.
+pub function dotenv_load(path = "") -> Dotenv
     if len(path) > 0
         return dotenv_new(load_file(path))
     end
     return dotenv_new(load())
 end
 
-# --- Idiomatic Struct Methods on Dotenv ---
+## Loads an environment file into a Dotenv struct instance with custom DotenvOptions.
+##
+## ### Parameters
+## - `path`: File system path.
+## - `opts`: Custom `DotenvOptions` configuration.
+##
+## ### Returns
+## Initialized `Dotenv` struct instance.
+pub function dotenv_load_with_options(path: string, opts: DotenvOptions) -> Dotenv
+    if len(path) > 0
+        return dotenv_new(load_file_with_options(path, opts))
+    end
+    return dotenv_new(load_with_options(opts))
+end
 
-pub function Dotenv.get(self, key, default_val = "")
+# ═══════════════════════════════════════════════════════════════
+# Options Constructors
+# ═══════════════════════════════════════════════════════════════
+
+## Creates a default DotenvOptions instance.
+##
+## ### Returns
+## Initialized `DotenvOptions` struct instance.
+pub function options() -> DotenvOptions
+    return options_new()
+end
+
+# ═══════════════════════════════════════════════════════════════
+# Idiomatic Struct Methods on Dotenv
+# ═══════════════════════════════════════════════════════════════
+
+## Gets a string value from this Dotenv instance.
+pub function Dotenv.get(self, key, default_val = "") -> string
     return get(self.entries, key, default_val)
 end
 
-pub function Dotenv.get_int(self, key, default_val = 0)
+## Gets an integer value from this Dotenv instance.
+pub function Dotenv.get_int(self, key, default_val = 0) -> int
     return get_int(self.entries, key, default_val)
 end
 
-pub function Dotenv.get_bool(self, key, default_val = 0)
+## Gets a boolean value from this Dotenv instance.
+pub function Dotenv.get_bool(self, key, default_val = 0) -> int
     return get_bool(self.entries, key, default_val)
 end
 
-pub function Dotenv.get_float(self, key, default_val = 0.0)
+## Gets a float value from this Dotenv instance.
+pub function Dotenv.get_float(self, key, default_val = 0.0) -> float
     return get_float(self.entries, key, default_val)
 end
 
-pub function Dotenv.has(self, key)
+## Checks if a key exists in this Dotenv instance.
+pub function Dotenv.has(self, key) -> int
     return has(self.entries, key)
 end
 
-pub function Dotenv.set(self, key, val)
+## Sets a key-value pair in this Dotenv instance.
+pub function Dotenv.set(self, key, val) -> Dotenv
     self.entries[key] = val
     return self
 end
 
-pub function Dotenv.dump(self)
+## Serializes this Dotenv instance back to a .env string using Auto quoting.
+pub function Dotenv.dump(self) -> string
     return dump(self.entries)
 end
 
-# Public API Facade Functions
+## Serializes this Dotenv instance back to a .env string with a specific QuoteMode.
+pub function Dotenv.dump_with_quote_mode(self, mode: QuoteMode) -> string
+    return dump_with_quote_mode(self.entries, mode)
+end
 
-# Parses raw .env string content into a key-value Map
-pub function parse_env(content)
+# ═══════════════════════════════════════════════════════════════
+# Public API Facade Functions
+# ═══════════════════════════════════════════════════════════════
+
+## Parses raw .env string content into a key-value Map.
+pub function parse_env(content) -> map
     return parse(content)
 end
 
-# Loads .env from current working directory
-pub function load_env()
+## Loads .env from current working directory or .env.local.
+pub function load_env() -> map
     return load()
 end
 
-# Serializes an env_map back to .env format string
-pub function dump_env(env_map)
+## Serializes an env_map back to .env format string.
+pub function dump_env(env_map) -> string
     return dump(env_map)
+end
+
+## Serializes an env_map back to .env format string with a specific QuoteMode.
+pub function dump_env_with_quote_mode(env_map, mode: QuoteMode) -> string
+    return dump_with_quote_mode(env_map, mode)
 end

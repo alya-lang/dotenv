@@ -1,21 +1,38 @@
-# ═══════════════════════════════════════════════════════════════
-# Dotenv Parser Module
-# ═══════════════════════════════════════════════════════════════
+## # dotenv/parser
+##
+## Parser and loader module for dotenv (.env) files.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
+##
+## Supports export statements, quoted values, escape sequences, inline comments,
+## and variable interpolation.
 
 import "std/str"
 import "std/fs"
 import "std/os"
+import "./types.alya"
 
-# Checks if a character is ASCII whitespace
-function is_space_char(ch)
+## Checks if a character is ASCII whitespace.
+##
+## ### Parameters
+## - `ch`: Character string.
+##
+## ### Returns
+## `1` if whitespace, `0` otherwise.
+pub function is_space_char(ch: string) -> int
     when ch
         is " ", "\t", "\r", "\n" then return 1
         else return 0
     end
 end
 
-# Strips quotes and resolves escaped characters for double quotes
-function unquote_value(val)
+## Strips quotes and resolves escape sequences for double-quoted values.
+##
+## ### Parameters
+## - `val`: Raw value string.
+##
+## ### Returns
+## Unquoted and unescaped value string.
+pub function unquote_value(val: string) -> string
     let vlen = len(val)
     if vlen >= 2
         let first = char_at(val, 0)
@@ -35,8 +52,14 @@ function unquote_value(val)
     return val
 end
 
-# Strips unquoted inline comments like: FOO=bar # comment
-function strip_inline_comment(val)
+## Strips unquoted inline comments from a value string (e.g. `FOO=bar # comment`).
+##
+## ### Parameters
+## - `val`: Value string.
+##
+## ### Returns
+## Value with trailing inline comment stripped.
+pub function strip_inline_comment(val: string) -> string
     let vlen = len(val)
     if vlen == 0
         return val
@@ -52,23 +75,54 @@ function strip_inline_comment(val)
             return ""
         end
         let prev_ch = char_at(val, hash_idx - 1)
-        if is_space_char(prev_ch)
+        if is_space_char(prev_ch) == 1
             return trim(val[..hash_idx])
         end
     end
     return val
 end
 
-# Checks whether a key exists in env_map
-pub function has(env_map, key)
+## Checks whether a key exists in an environment map.
+##
+## ### Parameters
+## - `env_map`: Environment variable map.
+## - `key`: Variable name key.
+##
+## ### Returns
+## `1` if key is present, `0` otherwise.
+pub function has(env_map, key) -> int
     if env_map is null
         return 0
     end
     return key in env_map ? 1 : 0
 end
 
-# Expands ${VAR} interpolations using current parsed map and OS environment
-function interpolate(val, env_map)
+## Expands `${VAR}` variable interpolations using parsed map and OS environment.
+##
+## ### Parameters
+## - `val`: String potentially containing `${VAR}` tokens.
+## - `env_map`: Currently parsed environment map.
+##
+## ### Returns
+## Interpolated string value.
+pub function interpolate(val: string, env_map) -> string
+    return interpolate_with_mode(val, env_map, 1)
+end
+
+## Expands `${VAR}` variable references with an explicit InterpolateMode value.
+##
+## ### Parameters
+## - `val`: String potentially containing `${VAR}` tokens.
+## - `env_map`: Currently parsed environment map.
+## - `mode`: Integer mode (`0` = Disabled, `1` = ProcessEnv, `2` = LocalOnly).
+##
+## ### Returns
+## Interpolated string value.
+pub function interpolate_with_mode(val: string, env_map, mode: int) -> string
+    if mode == 0
+        return val
+    end
+
     let res = val
     while contains(res, "${")
         let start = index_of(res, "${")
@@ -76,10 +130,10 @@ function interpolate(val, env_map)
         if start >= 0 and end_idx > start
             let var_name = res[(start + 2)..end_idx]
             let replacement = ""
-            if has(env_map, var_name)
+            if has(env_map, var_name) == 1
                 let raw_val = env_map[var_name]
                 replacement = raw_val is not null ? str_from_ptr(raw_val) : ""
-            else
+            elif mode == 1
                 replacement = env(var_name)
             end
             let target = "${" + var_name + "}"
@@ -91,13 +145,32 @@ function interpolate(val, env_map)
     return res
 end
 
-# Parses raw .env string content into a key-value Map
-pub function parse(content)
+## Parses raw .env string content into a key-value Map using default options.
+##
+## ### Parameters
+## - `content`: Raw `.env` file content string.
+##
+## ### Returns
+## Key-value Map of environment variables.
+pub function parse(content) -> map
+    return parse_with_options(content, options_new())
+end
+
+## Parses raw .env string content into a key-value Map using custom DotenvOptions.
+##
+## ### Parameters
+## - `content`: Raw `.env` file content string.
+## - `opts`: Custom `DotenvOptions` instance.
+##
+## ### Returns
+## Key-value Map of environment variables.
+pub function parse_with_options(content, opts: DotenvOptions) -> map
     let env_map = map()
     if content is null or len(content) == 0
         return env_map
     end
     let lines = split(content, "\n")
+    let interp_mode = opts.interpolate_mode
 
     for raw_line in lines
         let line = trim(raw_line)
@@ -126,7 +199,7 @@ pub function parse(content)
 
         val = strip_inline_comment(val)
         val = unquote_value(val)
-        val = interpolate(val, env_map)
+        val = interpolate_with_mode(val, env_map, interp_mode)
 
         env_map[key] = val
     end
@@ -134,8 +207,14 @@ pub function parse(content)
     return env_map
 end
 
-# Loads and parses a specific environment file
-pub function load_file(path)
+## Loads and parses a specific environment file from disk.
+##
+## ### Parameters
+## - `path`: File system path to `.env` file.
+##
+## ### Returns
+## Key-value Map of parsed environment variables.
+pub function load_file(path: string) -> map
     if fs_exists(path) == 0
         return map()
     end
@@ -143,12 +222,47 @@ pub function load_file(path)
     return parse(content)
 end
 
-# Loads .env from current working directory, falling back to .env.local
-pub function load()
+## Loads and parses a specific environment file from disk with custom DotenvOptions.
+##
+## ### Parameters
+## - `path`: File system path to `.env` file.
+## - `opts`: Custom `DotenvOptions` instance.
+##
+## ### Returns
+## Key-value Map of parsed environment variables.
+pub function load_file_with_options(path: string, opts: DotenvOptions) -> map
+    if fs_exists(path) == 0
+        return map()
+    end
+    let content = fs_read(path)
+    return parse_with_options(content, opts)
+end
+
+## Loads .env from current working directory, falling back to .env.local.
+##
+## ### Returns
+## Key-value Map of parsed environment variables.
+pub function load() -> map
     if fs_exists(".env")
         return load_file(".env")
     elif fs_exists(".env.local")
         return load_file(".env.local")
+    end
+    return map()
+end
+
+## Loads .env from current working directory with custom DotenvOptions.
+##
+## ### Parameters
+## - `opts`: Custom `DotenvOptions` instance.
+##
+## ### Returns
+## Key-value Map of parsed environment variables.
+pub function load_with_options(opts: DotenvOptions) -> map
+    if fs_exists(".env")
+        return load_file_with_options(".env", opts)
+    elif fs_exists(".env.local")
+        return load_file_with_options(".env.local", opts)
     end
     return map()
 end

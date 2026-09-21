@@ -11,3 +11,7 @@ repository = "https://github.com/alya-lang/dotenv"
 keywords = ["alya", "alya-lang", "dotenv", "env", "config", "configuration", "environment-variables"]
 
 [dependencies]
+
+# [lint]
+# disabled_rules = []
+# exclude = []

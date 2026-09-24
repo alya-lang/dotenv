@@ -8,7 +8,7 @@ authors = ["Alya Language Contributors <https://github.com/alya-lang>"]
 license = "MIT"
 homepage = "https://github.com/alya-lang/alya"
 repository = "https://github.com/alya-lang/dotenv"
-keywords = ["alya", "alya-lang", "dotenv", "env", "config", "configuration", "environment-variables"]
+keywords = ["alya", "alya-lang", "dotenv", "package", "env", "config", "configuration", "environment-variables"]
 
 [dependencies]
 

@@ -58,6 +58,7 @@ API_URL="http://${{HOST}}:${{PORT}}/v1"
     runner_assert_str_eq(r, dotenv::get(m, "API_URL"), "http://127.0.0.1:9000/v1", "variable interpolation")
 end
 
+@cfg(feature = "io")
 function test_file_operations(r)
     let test_file = "test_temp.env"
     let sample = "ENV_KEY=TempSavedVal\nENV_INT=42\n"
@@ -135,6 +136,7 @@ function main()
     test_basic_parsing(r)
     test_quotes_and_comments(r)
     test_interpolation(r)
+    @cfg(feature = "io")
     test_file_operations(r)
     test_dotenv_struct_methods(r)
     test_enums_and_options(r)

@@ -57,6 +57,22 @@ alya add dotenv --git https://github.com/alya-lang/dotenv --branch main
 alya install
 ```
 
+### Package Features
+
+| Feature | Default | Description |
+|:---|:---:|:---|
+| `io` | ✅ | File loading (`load_file`, `load`, `dotenv_load*`, `load_env`). Without it only in-memory parse/dump/getters remain. |
+
+```bash
+# Full build (default)
+alya install
+alya test
+
+# Slim build without file loading
+alya install --no-default-features
+alya test --no-default-features
+```
+
 ---
 
 ## 🚀 Quick Start

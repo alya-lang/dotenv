@@ -58,11 +58,14 @@ end
 
 ## Loads an environment file into a Dotenv struct instance.
 ##
+## Requires the `io` feature (default-on).
+##
 ## ### Parameters
 ## - `path`: Optional file path. If empty, searches `.env` then `.env.local`.
 ##
 ## ### Returns
 ## Initialized `Dotenv` struct instance.
+@cfg(feature = "io")
 pub function dotenv_load(path = "") -> Dotenv
     if len(path) > 0
         return dotenv_new(load_file(path))
@@ -72,12 +75,15 @@ end
 
 ## Loads an environment file into a Dotenv struct instance with custom DotenvOptions.
 ##
+## Requires the `io` feature (default-on).
+##
 ## ### Parameters
 ## - `path`: File system path.
 ## - `opts`: Custom `DotenvOptions` configuration.
 ##
 ## ### Returns
 ## Initialized `Dotenv` struct instance.
+@cfg(feature = "io")
 pub function dotenv_load_with_options(path: string, opts: DotenvOptions) -> Dotenv
     if len(path) > 0
         return dotenv_new(load_file_with_options(path, opts))
@@ -152,6 +158,9 @@ pub function parse_env(content) -> map
 end
 
 ## Loads .env from current working directory or .env.local.
+##
+## Requires the `io` feature (default-on).
+@cfg(feature = "io")
 pub function load_env() -> map
     return load()
 end

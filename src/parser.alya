@@ -7,6 +7,7 @@
 ## and variable interpolation.
 
 import "std/str"
+@cfg(feature = "io")
 import "std/fs"
 import "std/os"
 import "./types.alya"
@@ -209,11 +210,14 @@ end
 
 ## Loads and parses a specific environment file from disk.
 ##
+## Requires the `io` feature (default-on).
+##
 ## ### Parameters
 ## - `path`: File system path to `.env` file.
 ##
 ## ### Returns
 ## Key-value Map of parsed environment variables.
+@cfg(feature = "io")
 pub function load_file(path: string) -> map
     if fs_exists(path) == 0
         return map()
@@ -224,12 +228,15 @@ end
 
 ## Loads and parses a specific environment file from disk with custom DotenvOptions.
 ##
+## Requires the `io` feature (default-on).
+##
 ## ### Parameters
 ## - `path`: File system path to `.env` file.
 ## - `opts`: Custom `DotenvOptions` instance.
 ##
 ## ### Returns
 ## Key-value Map of parsed environment variables.
+@cfg(feature = "io")
 pub function load_file_with_options(path: string, opts: DotenvOptions) -> map
     if fs_exists(path) == 0
         return map()
@@ -240,8 +247,11 @@ end
 
 ## Loads .env from current working directory, falling back to .env.local.
 ##
+## Requires the `io` feature (default-on).
+##
 ## ### Returns
 ## Key-value Map of parsed environment variables.
+@cfg(feature = "io")
 pub function load() -> map
     if fs_exists(".env")
         return load_file(".env")
@@ -253,11 +263,14 @@ end
 
 ## Loads .env from current working directory with custom DotenvOptions.
 ##
+## Requires the `io` feature (default-on).
+##
 ## ### Parameters
 ## - `opts`: Custom `DotenvOptions` instance.
 ##
 ## ### Returns
 ## Key-value Map of parsed environment variables.
+@cfg(feature = "io")
 pub function load_with_options(opts: DotenvOptions) -> map
     if fs_exists(".env")
         return load_file_with_options(".env", opts)

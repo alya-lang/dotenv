@@ -19,7 +19,7 @@ import "./types.alya"
 ##
 ## ### Returns
 ## `1` if whitespace, `0` otherwise.
-pub function is_space_char(ch: string) -> int
+pub function is_space_char(ch: string) -> bool
     when ch
         is " ", "\t", "\r", "\n" then return true
         else return false

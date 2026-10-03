@@ -23,12 +23,12 @@ export DB_PORT=5432
 
     runner_assert_str_eq(r, dotenv::get(m, "APP_NAME"), "AlyaEngine", "parse basic string")
     runner_assert_eq(r, dotenv::get_int(m, "PORT"), 8080, "parse integer")
-    runner_assert_eq(r, dotenv::get_bool(m, "DEBUG"), 1, "parse boolean true")
+    runner_assert_eq(r, dotenv::get_bool(m, "DEBUG"), true, "parse boolean true")
     runner_assert(r, dotenv::get_float(m, "RATIO") > 3.0, "parse float")
     runner_assert_str_eq(r, dotenv::get(m, "EMPTY_VAL", "default"), "default", "fallback default on empty")
     runner_assert_str_eq(r, dotenv::get(m, "DB_HOST"), "localhost", "export keyword parsing")
-    runner_assert_eq(r, dotenv::has(m, "APP_NAME"), 1, "has key check")
-    runner_assert_eq(r, dotenv::has(m, "NON_EXISTENT"), 0, "has missing key check")
+    runner_assert_eq(r, dotenv::has(m, "APP_NAME"), true, "has key check")
+    runner_assert_eq(r, dotenv::has(m, "NON_EXISTENT"), false, "has missing key check")
 end
 
 function test_quotes_and_comments(r)
@@ -84,10 +84,10 @@ RATIO=2.718
     runner_assert(r, env_cfg is not null, "env_cfg struct is not null")
     runner_assert_str_eq(r, env_cfg.get("APP_TITLE"), "Microservice", "struct method get")
     runner_assert_eq(r, env_cfg.get_int("PORT"), 4000, "struct method get_int")
-    runner_assert_eq(r, env_cfg.get_bool("DEBUG"), 1, "struct method get_bool")
+    runner_assert_eq(r, env_cfg.get_bool("DEBUG"), true, "struct method get_bool")
     runner_assert(r, env_cfg.get_float("RATIO") > 2.7, "struct method get_float")
-    runner_assert_eq(r, env_cfg.has("PORT"), 1, "struct method has")
-    runner_assert_eq(r, env_cfg.has("NON_EXISTENT"), 0, "struct method has missing")
+    runner_assert_eq(r, env_cfg.has("PORT"), true, "struct method has")
+    runner_assert_eq(r, env_cfg.has("NON_EXISTENT"), false, "struct method has missing")
 
     env_cfg.set("NEW_VAR", "Hello")
     runner_assert_str_eq(r, env_cfg.get("NEW_VAR"), "Hello", "struct method set")

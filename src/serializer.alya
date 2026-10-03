@@ -36,17 +36,17 @@ pub function dump_with_quote_mode(env_map, quote_mode: QuoteMode) -> string
     let out = ""
     for k, raw in env_map
         let v = raw is not null ? str_from_ptr(raw) : ""
-        let should_quote = 0
+        let should_quote = false
         when qm
-            is 1 then should_quote = 1
-            is 2 then should_quote = 0
+            is 1 then should_quote = true
+            is 2 then should_quote = false
             else
                 if contains(v, " ") or contains(v, "#") or contains(v, "\n") or contains(v, "\r") or contains(v, "=")
-                    should_quote = 1
+                    should_quote = true
                 end
         end
 
-        if should_quote == 1
+        if should_quote == true
             let escaped = replace(v, "\"", "\\\"")
             out += k + "=\"" + escaped + "\"\n"
         else

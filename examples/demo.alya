@@ -18,7 +18,7 @@ function main()
 
     say "  Application:   " + style_bold(app)
     say "  Listening on:  " + color_green("http://localhost:" + str(port))
-    say "  Debug Mode:    " + (debug_mode == 1 ? color_yellow("ENABLED") : "DISABLED")
+    say "  Debug Mode:    " + (debug_mode == true ? color_yellow("ENABLED") : "DISABLED")
     say "  Worker Pool:   " + str(workers) + " thread(s)"
     say "  Database URL:  " + color_blue(db_url)
     say color_cyan("═══════════════════════════════════════════════════")
@@ -40,7 +40,7 @@ function main()
 
     say "  Application:   " + style_bold(app)
     say "  Listening on:  " + color_green("http://localhost:" + str(port))
-    say "  Debug Mode:    " + (debug_mode == 1 ? color_yellow("ENABLED") : "DISABLED")
+    say "  Debug Mode:    " + (debug_mode == true ? color_yellow("ENABLED") : "DISABLED")
     say "  Worker Pool:   " + str(workers) + " thread(s)"
     say "  Database URL:  " + color_blue(db_url)
     say color_cyan("═══════════════════════════════════════════════════")

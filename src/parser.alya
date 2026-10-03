@@ -21,8 +21,8 @@ import "./types.alya"
 ## `1` if whitespace, `0` otherwise.
 pub function is_space_char(ch: string) -> int
     when ch
-        is " ", "\t", "\r", "\n" then return 1
-        else return 0
+        is " ", "\t", "\r", "\n" then return true
+        else return false
     end
 end
 
@@ -76,7 +76,7 @@ pub function strip_inline_comment(val: string) -> string
             return ""
         end
         let prev_ch = char_at(val, hash_idx - 1)
-        if is_space_char(prev_ch) == 1
+        if is_space_char(prev_ch) == true
             return trim(val[..hash_idx])
         end
     end
@@ -93,9 +93,9 @@ end
 ## `1` if key is present, `0` otherwise.
 pub function has(env_map, key) -> int
     if env_map is null
-        return 0
+        return false
     end
-    return key in env_map ? 1 : 0
+    return key in env_map ? true : false
 end
 
 ## Expands `${VAR}` variable interpolations using parsed map and OS environment.
@@ -131,7 +131,7 @@ pub function interpolate_with_mode(val: string, env_map, mode: int) -> string
         if start >= 0 and end_idx > start
             let var_name = res[(start + 2)..end_idx]
             let replacement = ""
-            if has(env_map, var_name) == 1
+            if has(env_map, var_name) == true
                 let raw_val = env_map[var_name]
                 replacement = raw_val is not null ? str_from_ptr(raw_val) : ""
             elif mode == 1
@@ -219,7 +219,7 @@ end
 ## Key-value Map of parsed environment variables.
 @cfg(feature = "io")
 pub function load_file(path: string) -> map
-    if fs_exists(path) == 0
+    if fs_exists(path) == false
         return map()
     end
     let content = fs_read(path)
@@ -238,7 +238,7 @@ end
 ## Key-value Map of parsed environment variables.
 @cfg(feature = "io")
 pub function load_file_with_options(path: string, opts: DotenvOptions) -> map
-    if fs_exists(path) == 0
+    if fs_exists(path) == false
         return map()
     end
     let content = fs_read(path)

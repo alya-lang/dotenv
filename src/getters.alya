@@ -18,7 +18,7 @@ import "./parser.alya"
 ## ### Returns
 ## Resolved string value or default_val.
 pub function get(env_map, key, default_val = "") -> string
-    if env_map is not null and has(env_map, key) == 1
+    if env_map is not null and has(env_map, key) == true
         let raw = env_map[key]
         if raw is not null
             let v = str_from_ptr(raw)
@@ -72,8 +72,8 @@ end
 pub function get_bool(env_map, key, default_val = 0) -> int
     let val_str = lower(trim(get(env_map, key, "")))
     when val_str
-        is "true", "1", "yes", "on" then return 1
-        is "false", "0", "no", "off" then return 0
+        is "true", "1", "yes", "on" then return true
+        is "false", "0", "no", "off" then return false
         else return default_val
     end
 end

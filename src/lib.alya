@@ -109,27 +109,27 @@ end
 
 ## Gets a string value from this Dotenv instance.
 pub function Dotenv.get(self, key, default_val = "") -> string
-    return get(self.entries, key, default_val)
+    return map_get(self.entries, key, default_val)
 end
 
 ## Gets an integer value from this Dotenv instance.
 pub function Dotenv.get_int(self, key, default_val = 0) -> int
-    return get_int(self.entries, key, default_val)
+    return map_get_int(self.entries, key, default_val)
 end
 
 ## Gets a boolean value from this Dotenv instance.
 pub function Dotenv.get_bool(self, key, default_val = 0) -> int
-    return get_bool(self.entries, key, default_val)
+    return map_get_bool(self.entries, key, default_val)
 end
 
 ## Gets a float value from this Dotenv instance.
 pub function Dotenv.get_float(self, key, default_val = 0.0) -> float
-    return get_float(self.entries, key, default_val)
+    return map_get_float(self.entries, key, default_val)
 end
 
 ## Checks if a key exists in this Dotenv instance.
 pub function Dotenv.has(self, key) -> int
-    return has(self.entries, key)
+    return map_has(self.entries, key)
 end
 
 ## Sets a key-value pair in this Dotenv instance.
@@ -140,12 +140,12 @@ end
 
 ## Serializes this Dotenv instance back to a .env string using Auto quoting.
 pub function Dotenv.dump(self) -> string
-    return dump(self.entries)
+    return dump_map(self.entries)
 end
 
 ## Serializes this Dotenv instance back to a .env string with a specific QuoteMode.
 pub function Dotenv.dump_with_quote_mode(self, mode: QuoteMode) -> string
-    return dump_with_quote_mode(self.entries, mode)
+    return dump_map_with_quote_mode(self.entries, mode)
 end
 
 # ═══════════════════════════════════════════════════════════════
@@ -167,10 +167,10 @@ end
 
 ## Serializes an env_map back to .env format string.
 pub function dump_env(env_map) -> string
-    return dump(env_map)
+    return dump_map(env_map)
 end
 
 ## Serializes an env_map back to .env format string with a specific QuoteMode.
 pub function dump_env_with_quote_mode(env_map, mode: QuoteMode) -> string
-    return dump_with_quote_mode(env_map, mode)
+    return dump_map_with_quote_mode(env_map, mode)
 end

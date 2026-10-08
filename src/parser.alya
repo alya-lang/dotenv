@@ -91,11 +91,16 @@ end
 ##
 ## ### Returns
 ## `1` if key is present, `0` otherwise.
-pub function has(env_map, key) -> int
+pub function map_has(env_map, key) -> int
     if env_map is null
         return false
     end
     return key in env_map ? true : false
+end
+
+## Backward-compatible alias (kept for public API).
+pub function has(env_map, key) -> int
+    return map_has(env_map, key)
 end
 
 ## Expands `${VAR}` variable interpolations using parsed map and OS environment.
@@ -131,9 +136,9 @@ pub function interpolate_with_mode(val: string, env_map, mode: int) -> string
         if start >= 0 and end_idx > start
             let var_name = res[(start + 2)..end_idx]
             let replacement = ""
-            if has(env_map, var_name) == true
+            if map_has(env_map, var_name) == true
                 let raw_val = env_map[var_name]
-                replacement = raw_val is not null ? str_from_ptr(raw_val) : ""
+                replacement = raw_val is not null ? str(raw_val) : ""
             elif mode == 1
                 replacement = env(var_name)
             end

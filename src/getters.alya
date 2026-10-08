@@ -17,17 +17,22 @@ import "./parser.alya"
 ##
 ## ### Returns
 ## Resolved string value or default_val.
-pub function get(env_map, key, default_val = "") -> string
-    if env_map is not null and has(env_map, key) == true
+pub function map_get(env_map, key, default_val = "") -> string
+    if env_map is not null and map_has(env_map, key) == true
         let raw = env_map[key]
         if raw is not null
-            let v = str_from_ptr(raw)
+            let v = str(raw)
             if len(v) > 0
                 return v
             end
         end
     end
     return default_val
+end
+
+## Backward-compatible alias (kept for public API).
+pub function get(env_map, key, default_val = "") -> string
+    return map_get(env_map, key, default_val)
 end
 
 ## Gets a string value from env_map, returning default_val if key is missing or empty.
@@ -40,7 +45,7 @@ end
 ## ### Returns
 ## Resolved string value or default_val.
 pub function get_or_default(env_map, key: string, default_val: string) -> string
-    return get(env_map, key, default_val)
+    return map_get(env_map, key, default_val)
 end
 
 ## Gets an integer value from env_map, returning default_val if missing or unparseable.
@@ -52,12 +57,17 @@ end
 ##
 ## ### Returns
 ## Parsed integer value or default_val.
-pub function get_int(env_map, key, default_val = 0) -> int
-    let val_str = get(env_map, key, "")
+pub function map_get_int(env_map, key, default_val = 0) -> int
+    let val_str = map_get(env_map, key, "")
     if len(val_str) == 0
         return default_val
     end
     return to_int(val_str)
+end
+
+## Backward-compatible alias (kept for public API).
+pub function get_int(env_map, key, default_val = 0) -> int
+    return map_get_int(env_map, key, default_val)
 end
 
 ## Gets a boolean value from env_map (`true`, `1`, `yes`, `on` -> `1`; `false`, `0`, `no`, `off` -> `0`).
@@ -69,13 +79,18 @@ end
 ##
 ## ### Returns
 ## Boolean integer (`1` or `0`).
-pub function get_bool(env_map, key, default_val = 0) -> int
-    let val_str = lower(trim(get(env_map, key, "")))
+pub function map_get_bool(env_map, key, default_val = 0) -> int
+    let val_str = lower(trim(map_get(env_map, key, "")))
     when val_str
         is "true", "1", "yes", "on" then return true
         is "false", "0", "no", "off" then return false
         else return default_val
     end
+end
+
+## Backward-compatible alias (kept for public API).
+pub function get_bool(env_map, key, default_val = 0) -> int
+    return map_get_bool(env_map, key, default_val)
 end
 
 ## Gets a floating point number from env_map, returning default_val if missing or unparseable.
@@ -87,10 +102,15 @@ end
 ##
 ## ### Returns
 ## Parsed float value or default_val.
-pub function get_float(env_map, key, default_val = 0.0) -> float
-    let val_str = get(env_map, key, "")
+pub function map_get_float(env_map, key, default_val = 0.0) -> float
+    let val_str = map_get(env_map, key, "")
     if len(val_str) == 0
         return default_val
     end
     return to_float(val_str)
+end
+
+## Backward-compatible alias (kept for public API).
+pub function get_float(env_map, key, default_val = 0.0) -> float
+    return map_get_float(env_map, key, default_val)
 end

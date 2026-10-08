@@ -15,8 +15,13 @@ import "./types.alya"
 ##
 ## ### Returns
 ## Formatted `.env` string.
+pub function dump_map(env_map) -> string
+    return dump_map_with_quote_mode(env_map, QuoteMode.Auto)
+end
+
+## Backward-compatible alias (kept for public API).
 pub function dump(env_map) -> string
-    return dump_with_quote_mode(env_map, QuoteMode.Auto)
+    return dump_map(env_map)
 end
 
 ## Serializes an environment map back to a .env formatted string with explicit QuoteMode.
@@ -27,7 +32,7 @@ end
 ##
 ## ### Returns
 ## Formatted `.env` string.
-pub function dump_with_quote_mode(env_map, quote_mode: QuoteMode) -> string
+pub function dump_map_with_quote_mode(env_map, quote_mode: QuoteMode) -> string
     if env_map is null
         return ""
     end
@@ -35,7 +40,7 @@ pub function dump_with_quote_mode(env_map, quote_mode: QuoteMode) -> string
     let qm = quote_mode as int
     let out = ""
     for k, raw in env_map
-        let v = raw is not null ? str_from_ptr(raw) : ""
+        let v = raw is not null ? str(raw) : ""
         let should_quote = false
         when qm
             is 1 then should_quote = true
@@ -54,4 +59,9 @@ pub function dump_with_quote_mode(env_map, quote_mode: QuoteMode) -> string
         end
     end
     return out
+end
+
+## Backward-compatible alias (kept for public API).
+pub function dump_with_quote_mode(env_map, quote_mode: QuoteMode) -> string
+    return dump_map_with_quote_mode(env_map, quote_mode)
 end

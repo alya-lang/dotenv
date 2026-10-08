@@ -10,11 +10,11 @@ function main()
 
     let cfg = dotenv::parse("APP_NAME=SlimApp\nPORT=3000\nDEBUG=off\nMAX_WORKERS=1\nDATABASE_URL=sqlite://local.db\n")
 
-    let app = dotenv::get(cfg, "APP_NAME", "DefaultApp")
-    let port = dotenv::get_int(cfg, "PORT", 3000)
-    let debug_mode = dotenv::get_bool(cfg, "DEBUG", 0)
-    let workers = dotenv::get_int(cfg, "MAX_WORKERS", 1)
-    let db_url = dotenv::get(cfg, "DATABASE_URL")
+    let app = dotenv::map_get(cfg, "APP_NAME", "DefaultApp")
+    let port = dotenv::map_get_int(cfg, "PORT", 3000)
+    let debug_mode = dotenv::map_get_bool(cfg, "DEBUG", 0)
+    let workers = dotenv::map_get_int(cfg, "MAX_WORKERS", 1)
+    let db_url = dotenv::map_get(cfg, "DATABASE_URL")
 
     say "  Application:   " + style_bold(app)
     say "  Listening on:  " + color_green("http://localhost:" + str(port))
@@ -32,11 +32,11 @@ function main()
 
     let cfg = dotenv::load_file("examples/sample.env")
 
-    let app = dotenv::get(cfg, "APP_NAME", "DefaultApp")
-    let port = dotenv::get_int(cfg, "PORT", 3000)
-    let debug_mode = dotenv::get_bool(cfg, "DEBUG", 0)
-    let workers = dotenv::get_int(cfg, "MAX_WORKERS", 1)
-    let db_url = dotenv::get(cfg, "DATABASE_URL")
+    let app = dotenv::map_get(cfg, "APP_NAME", "DefaultApp")
+    let port = dotenv::map_get_int(cfg, "PORT", 3000)
+    let debug_mode = dotenv::map_get_bool(cfg, "DEBUG", 0)
+    let workers = dotenv::map_get_int(cfg, "MAX_WORKERS", 1)
+    let db_url = dotenv::map_get(cfg, "DATABASE_URL")
 
     say "  Application:   " + style_bold(app)
     say "  Listening on:  " + color_green("http://localhost:" + str(port))

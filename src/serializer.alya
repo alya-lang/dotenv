@@ -19,6 +19,11 @@ pub function dump_map(env_map) -> string
     return dump_map_with_quote_mode(env_map, QuoteMode.Auto)
 end
 
+## Backward-compatible alias (kept for public API).
+pub function dump(env_map) -> string
+    return dump_map(env_map)
+end
+
 ## Serializes an environment map back to a .env formatted string with explicit QuoteMode.
 ##
 ## ### Parameters
@@ -54,4 +59,9 @@ pub function dump_map_with_quote_mode(env_map, quote_mode: QuoteMode) -> string
         end
     end
     return out
+end
+
+## Backward-compatible alias (kept for public API).
+pub function dump_with_quote_mode(env_map, quote_mode: QuoteMode) -> string
+    return dump_map_with_quote_mode(env_map, quote_mode)
 end

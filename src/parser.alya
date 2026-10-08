@@ -98,6 +98,11 @@ pub function map_has(env_map, key) -> int
     return key in env_map ? true : false
 end
 
+## Backward-compatible alias (kept for public API).
+pub function has(env_map, key) -> int
+    return map_has(env_map, key)
+end
+
 ## Expands `${VAR}` variable interpolations using parsed map and OS environment.
 ##
 ## ### Parameters

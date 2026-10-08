@@ -30,6 +30,11 @@ pub function map_get(env_map, key, default_val = "") -> string
     return default_val
 end
 
+## Backward-compatible alias (kept for public API).
+pub function get(env_map, key, default_val = "") -> string
+    return map_get(env_map, key, default_val)
+end
+
 ## Gets a string value from env_map, returning default_val if key is missing or empty.
 ##
 ## ### Parameters
@@ -60,6 +65,11 @@ pub function map_get_int(env_map, key, default_val = 0) -> int
     return to_int(val_str)
 end
 
+## Backward-compatible alias (kept for public API).
+pub function get_int(env_map, key, default_val = 0) -> int
+    return map_get_int(env_map, key, default_val)
+end
+
 ## Gets a boolean value from env_map (`true`, `1`, `yes`, `on` -> `1`; `false`, `0`, `no`, `off` -> `0`).
 ##
 ## ### Parameters
@@ -78,6 +88,11 @@ pub function map_get_bool(env_map, key, default_val = 0) -> int
     end
 end
 
+## Backward-compatible alias (kept for public API).
+pub function get_bool(env_map, key, default_val = 0) -> int
+    return map_get_bool(env_map, key, default_val)
+end
+
 ## Gets a floating point number from env_map, returning default_val if missing or unparseable.
 ##
 ## ### Parameters
@@ -93,4 +108,9 @@ pub function map_get_float(env_map, key, default_val = 0.0) -> float
         return default_val
     end
     return to_float(val_str)
+end
+
+## Backward-compatible alias (kept for public API).
+pub function get_float(env_map, key, default_val = 0.0) -> float
+    return map_get_float(env_map, key, default_val)
 end

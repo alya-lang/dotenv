@@ -21,12 +21,12 @@ function main()
     bench_start(runner, 50000)
     let j = 0
     while j < 50000
-        dotenv::map_get(config, "API_KEY", "")
-        dotenv::map_get_int(config, "APP_PORT", 0)
-        dotenv::map_get_bool(config, "DEBUG", 0)
+        dotenv::get(config, "API_KEY", "")
+        dotenv::get_int(config, "APP_PORT", 0)
+        dotenv::get_bool(config, "DEBUG", 0)
         j += 1
     end
-    bench_stop(runner, "dotenv::map_get / map_get_int / map_get_bool")
+    bench_stop(runner, "dotenv::get / get_int / get_bool")
 
     bench_summary(runner)
 end

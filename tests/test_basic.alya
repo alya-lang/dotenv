@@ -51,7 +51,7 @@ function test_interpolation(r)
     let sample = """
 HOST=127.0.0.1
 PORT=9000
-API_URL="http://${{HOST}}:${{PORT}}/v1"
+API_URL=f"http://${{HOST}}:${{PORT}}/v1"
 """
     let m = dotenv::parse(sample)
 
@@ -114,10 +114,10 @@ function test_enums_and_options(r)
     runner_assert(r, contains(dump_never, "SPACED=hello world"), "dump never omits quotes spaced")
 
     # InterpolateMode tests
-    let template = "BASE=abc\nFULL=${{BASE}}_123\n"
+    let template = f"BASE=abc\nFULL=${{BASE}}_123\n"
     let no_interp_opts = dotenv::options_with_interpolate(dotenv::InterpolateMode.Disabled)
     let m_no_interp = dotenv::parse_with_options(template, no_interp_opts)
-    runner_assert_str_eq(r, dotenv::get(m_no_interp, "FULL"), "${{BASE}}_123", "disabled interpolation leaves raw token")
+    runner_assert_str_eq(r, dotenv::get(m_no_interp, "FULL"), f"${{BASE}}_123", "disabled interpolation leaves raw token")
 
     let local_opts = dotenv::options_with_interpolate(dotenv::InterpolateMode.LocalOnly)
     let m_local = dotenv::parse_with_options(template, local_opts)
